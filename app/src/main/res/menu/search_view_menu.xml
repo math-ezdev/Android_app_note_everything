@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_chooseAll"
+        android:title="Choose All Item"
+        android:icon="@drawable/icon_done_all"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/menu_delete"
+        android:title="Delete Selected Item"
+        android:icon="@drawable/icon_clear"
+        app:showAsAction="always"
+        />
+</menu>
