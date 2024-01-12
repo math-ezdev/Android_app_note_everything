@@ -13,11 +13,11 @@
         android:theme="@style/Theme.TodoApp"
         tools:targetApi="31">
         <activity
-            android:parentActivityName=".ui.MainActivity"
-            android:name=".ui.NoteActivity"
+            android:parentActivityName=".ui.screen.MainActivity"
+            android:name=".ui.screen.NoteActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.screen.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

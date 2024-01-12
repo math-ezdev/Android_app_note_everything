@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    style="@style/card_clickable"
-    android:layout_margin="@dimen/padding_medium"
-    android:id="@+id/card_note"
-    android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/tv_noteTitle"
-        android:text="@string/app_name"
-        android:padding="@dimen/padding_medium"
-        style="@style/TextAppearance.Material3.BodyLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <data>
 
-</com.google.android.material.card.MaterialCardView>
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        style="@style/card_clickable"
+        android:layout_margin="@dimen/padding_medium"
+        android:id="@+id/card_note"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_noteTitle"
+            android:padding="@dimen/padding_medium"
+            style="@style/TextAppearance.Material3.BodyLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.card.MaterialCardView>
+</layout>

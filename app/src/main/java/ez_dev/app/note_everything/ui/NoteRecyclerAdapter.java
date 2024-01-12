@@ -9,20 +9,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ez_dev.app.note_everything.data.local.Note;
+import ez_dev.app.note_everything.data.local.NoteEntity;
 import ez_dev.app.note_everything.databinding.ItemNoteBinding;
+import ez_dev.app.note_everything.util.OnClickListener;
 
 public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.NoteViewHolder> {
-    private List<Note> dataSet;
+    private List<NoteEntity> dataSet;
     private OnClickListener onClickListener;
 
-    public List<Note> getData() {
+    public List<NoteEntity> getData() {
         return dataSet;
     }
 
-    public List<Note> getCheckedData() {
-        List<Note> selectedDataSet = new ArrayList<>();
-        for (Note item : dataSet) {
+    public List<NoteEntity> getCheckedData() {
+        List<NoteEntity> selectedDataSet = new ArrayList<>();
+        for (NoteEntity item : dataSet) {
             if (item.isChecked) {
                 selectedDataSet.add(item);
             }
@@ -30,7 +31,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         return selectedDataSet;
     }
 
-    public void setData(List<Note> dataSet) {
+    public void setData(List<NoteEntity> dataSet) {
         this.dataSet = dataSet;
     }
 
@@ -49,7 +50,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
-        Note note = dataSet.get(position);
+        NoteEntity note = dataSet.get(position);
 
         //  ui
         holder.binding.tvNoteTitle.setText(note.title);
@@ -68,6 +69,8 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         }
 
     }
+
+
 
     @Override
     public int getItemCount() {

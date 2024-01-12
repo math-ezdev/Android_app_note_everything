@@ -12,18 +12,18 @@ import java.util.List;
 
 @Dao
 public interface NoteDAO {
-    @Query("SELECT * FROM table_note")
-    LiveData<List<Note>> getAll();
+    @Query("SELECT * FROM note_table")
+    LiveData<List<NoteEntity>> getAll();
 
-    @Query("SELECT * FROM table_note WHERE title LIKE '%' || :title || '%'")
-    LiveData<List<Note>> findByTitle(String title);
+    @Query("SELECT * FROM note_table WHERE title LIKE '%' || :title || '%'")
+    LiveData<List<NoteEntity>> findByTitle(String title);
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    long[] insert(Note... notes);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long[] insert(NoteEntity... notes);
 
     @Update
-    int update(Note... notes);
+    int update(NoteEntity... notes);
 
     @Delete
-    int delete(Note... notes);
+    int delete(NoteEntity... notes);
 }
