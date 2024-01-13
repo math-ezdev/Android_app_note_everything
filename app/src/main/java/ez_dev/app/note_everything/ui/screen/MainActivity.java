@@ -1,16 +1,18 @@
 package ez_dev.app.note_everything.ui.screen;
 
-import static ez_dev.app.note_everything.ui.screen.NoteActivity.RESULT_CAN_BE_DELETE;
+import static ez_dev.app.note_everything.ui.screen.NoteActivity.RESULT_CODE_DELETE;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.Nullable;
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
-import java.util.List;
 
 import ez_dev.app.note_everything.R;
 import ez_dev.app.note_everything.data.local.NoteEntity;
@@ -20,8 +22,6 @@ import ez_dev.app.note_everything.ui.state.MainViewModel;
 import ez_dev.app.note_everything.util.OnClickListener;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int ADD_NOTE_ACTIVITY_REQUEST_CODE = 1;
-    private static final int UPDATE_NOTE_ACTIVITY_REQUEST_CODE = 2;
     public static final String DATA_CURRENT = "NOTE_CURRENT";
     private ActivityMainBinding binding;
 
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             public <E> void setOnClickListener(E element, int position) {
                 Intent intent = new Intent(MainActivity.this, NoteActivity.class);
                 intent.putExtra(DATA_CURRENT, (NoteEntity) element);
-                startActivityForResult(intent, UPDATE_NOTE_ACTIVITY_REQUEST_CODE);
+                updatingNoteActivityResultLauncher.launch(intent);
             }
 
             @Override
@@ -57,17 +57,26 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        binding.revNote.setAdapter(adapter);
 
 
         //  view model
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        viewModel.getAllNotes().observe(this, this::refreshUiData);
+        viewModel.getAllNotes().observe(this, notes -> adapter.setData(notes));
+        viewModel.title.observe(this, title -> {
+            viewModel.findByTitle(title).observe(this, notes -> adapter.setData(notes));
+            binding.searchbar.setText(title);
+        });
 
 
         //  handle user event
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> {
+            viewModel.setTitle("");
+            binding.swipeRefreshLayout.setRefreshing(false);
+        });
         binding.btnAddNote.setOnClickListener(v -> {
             Intent intent = new Intent(this, NoteActivity.class);
-            startActivityForResult(intent, ADD_NOTE_ACTIVITY_REQUEST_CODE);
+            addingNoteActivityResultLauncher.launch(intent);
         });
         binding.searchbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.menu_chooseAll) {
@@ -87,46 +96,60 @@ public class MainActivity extends AppCompatActivity {
         });
         binding.search.getEditText().setOnEditorActionListener((view, actionId, event) -> {
             String title = binding.search.getText().toString().trim();
-            binding.searchbar.setText(title);
-            viewModel.findByTitle(title).observe(this, this::refreshUiData);
+            viewModel.setTitle(title);
             binding.search.hide();
-            return false;
+            return true;
         });
 
 
+        //  onBackPressed
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (binding.search.isShown()) {
+                    binding.search.hide();
+                }
+            }
+        });
+
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    ActivityResultLauncher<Intent> addingNoteActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            int resultCode = result.getResultCode();
+            Intent data = result.getData();
 
-        if (data != null) {
-            NoteEntity resultData = (NoteEntity) data.getSerializableExtra(NoteActivity.DATA_RESULT);
-            switch (resultCode) {
-                case RESULT_OK:
-                    switch (requestCode) {
-                        case ADD_NOTE_ACTIVITY_REQUEST_CODE:
-                            viewModel.insert(resultData);
-                            break;
-                        case UPDATE_NOTE_ACTIVITY_REQUEST_CODE:
-                            viewModel.update(resultData);
-                            break;
-                        default:
-                    }
-                    break;
-                case RESULT_CAN_BE_DELETE:
-                    viewModel.delete(resultData);
-                    break;
-                default:
+            if (data != null) {
+                NoteEntity resultData = (NoteEntity) data.getSerializableExtra(NoteActivity.DATA_RESULT);
+                if (resultCode == RESULT_OK) {
+                    viewModel.insert(resultData);
+                }
             }
         }
+    });
 
-    }
+    ActivityResultLauncher<Intent> updatingNoteActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            int resultCode = result.getResultCode();
+            Intent data = result.getData();
 
-    private void refreshUiData(List<NoteEntity> notes) {
-        adapter.setData(notes);
-        binding.revNote.setAdapter(adapter);
-    }
+            if (data != null) {
+                NoteEntity resultData = (NoteEntity) data.getSerializableExtra(NoteActivity.DATA_RESULT);
+                switch (resultCode) {
+                    case RESULT_OK:
+                        viewModel.update(resultData);
+                        break;
+                    case RESULT_CODE_DELETE:
+                        viewModel.delete(resultData);
+                        break;
+                    default:
+                }
+            }
+        }
+    });
+
 
     private void toggleSelectAllItem(boolean reverseCheck) {
         adapter.getData().forEach(it -> it.isChecked = !reverseCheck);

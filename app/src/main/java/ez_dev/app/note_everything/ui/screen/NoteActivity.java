@@ -13,7 +13,7 @@ import ez_dev.app.note_everything.ui.state.NoteViewModel;
 
 public class NoteActivity extends AppCompatActivity {
     public static final String DATA_RESULT = "NOTE_INPUT";
-    public static final int RESULT_CAN_BE_DELETE = 2;
+    public static final int RESULT_CODE_DELETE = 2;
     private Intent resultIntent;
 
     @Override
@@ -34,7 +34,7 @@ public class NoteActivity extends AppCompatActivity {
             viewModel.setItem(currentNote);
             binding.btnDelete.setOnClickListener(v -> {
                 resultIntent.putExtra(DATA_RESULT, viewModel.item.getValue());
-                setResult(RESULT_CAN_BE_DELETE, resultIntent);
+                setResult(RESULT_CODE_DELETE, resultIntent);
                 finish();
             });
         }

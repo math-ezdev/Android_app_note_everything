@@ -14,7 +14,7 @@ import ez_dev.app.note_everything.databinding.ItemNoteBinding;
 import ez_dev.app.note_everything.util.OnClickListener;
 
 public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.NoteViewHolder> {
-    private List<NoteEntity> dataSet;
+    private List<NoteEntity> dataSet = new ArrayList<>();
     private OnClickListener onClickListener;
 
     public List<NoteEntity> getData() {
@@ -33,6 +33,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
     public void setData(List<NoteEntity> dataSet) {
         this.dataSet = dataSet;
+        notifyDataSetChanged();
     }
 
     public void setOnClickListener(OnClickListener onClickListener) {
